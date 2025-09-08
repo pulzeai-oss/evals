@@ -1,7 +1,8 @@
-from datasets import load_dataset
 import hashlib
 import json
 import os
+
+from datasets import load_dataset
 from tqdm import tqdm
 
 task_list = [
@@ -64,6 +65,7 @@ task_list = [
     "college_biology",
 ]
 
+
 def create_mmlu_id(subject, question):
     # Combine subject and question text
     id_str = f"{subject}-{question}"
@@ -72,6 +74,7 @@ def create_mmlu_id(subject, question):
     # Shorten the hash to first 8 characters for readability
     mmlu_id_short = mmlu_id[:8]
     return f"mmlu_id_{mmlu_id_short}"
+
 
 # Ensure the output directory exists
 output_dir = "mmlu/data"
@@ -82,7 +85,7 @@ for subject in task_list:
     # Load the MMLU dataset for the current subject
     dataset = load_dataset("cais/mmlu", subject)
     # Access the 'test' split
-    test_dataset = dataset['test']
+    test_dataset = dataset["test"]
 
     # Define the output file path, adjusting the subject name
     # Replace any spaces or special characters in subject for file naming
@@ -90,36 +93,36 @@ for subject in task_list:
     output_file = os.path.join(output_dir, f"mmlu_{safe_subject}.jsonl")
 
     # Open the output file
-    with open(output_file, 'w', encoding='utf-8') as f_out:
+    with open(output_file, "w", encoding="utf-8") as f_out:
         # Iterate over the dataset
         for item in tqdm(test_dataset, desc=f"Writing {subject}"):
             # Extract fields from MMLU dataset
-            question = item['question']
+            question = item["question"]
 
             # The 'choices' might be in 'answer_choices' or 'choices' depending on the dataset
             # Let's check which field is correct
-            if 'choices' in item:
-                choices = item['choices']
-            elif 'answer_choices' in item:
-                choices = item['answer_choices']
+            if "choices" in item:
+                choices = item["choices"]
+            elif "answer_choices" in item:
+                choices = item["answer_choices"]
             else:
                 raise ValueError("Choices not found in dataset item.")
 
             # The 'answer' field is expected to be a string representing an option label ('A', 'B', 'C', 'D')
-            correct_answer = item['answer']
+            correct_answer = item["answer"]
 
             # Create mmlu_id
             mmlu_id = create_mmlu_id(subject, question)
 
             # Construct the formatted question
             # Prepend with the desired prompt
-            subject_name = subject.replace('_', ' ').title()
+            subject_name = subject.replace("_", " ").title()
             formatted_question = f"### Question: {question} ### Choices:"
             # formatted_question = f"Answer the following {subject_name} multiple-choice question. ### Question: {question} ### Choices:"
 
             # Append the choices formatted as "0) choice1 1) choice2 2) choice3 3) choice4"
-            choices_str = ' '.join([f"{idx}) {choice.strip()}" for idx, choice in enumerate(choices)])
-            formatted_question += ' ' + choices_str
+            choices_str = " ".join([f"{idx}) {choice.strip()}" for idx, choice in enumerate(choices)])
+            formatted_question += " " + choices_str
 
             # Construct the data in standardized format
             data = {
@@ -135,4 +138,4 @@ for subject in task_list:
 
             # Write the data as JSONL
             json_line = json.dumps(data, ensure_ascii=False)
-            f_out.write(json_line + '\n')
+            f_out.write(json_line + "\n")

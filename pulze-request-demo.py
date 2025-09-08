@@ -1,4 +1,5 @@
 import json
+
 import requests
 
 # Set up your API key (replace with your actual key)
@@ -7,14 +8,12 @@ url = "https://api.pulze.ai/v1/chat/completions"
 headers = {
     "Content-Type": "application/json",
     "Authorization": f"Bearer {api_key}",
-    "Pulze-Feature-Flags": '{ "auto_tools": "true" }'
+    "Pulze-Feature-Flags": '{ "auto_tools": "true" }',
 }
 data = {
     "plugins": ["web-search"],
     "model": "openai/gpt-4o",
-    "messages": [
-            {"role": "user", "content": f"Tell me a joke."}
-        ]
+    "messages": [{"role": "user", "content": "Tell me a joke."}],
     # "temperature": temperature,
     # "max_tokens": max_tokens
 }
