@@ -1,15 +1,15 @@
-import os
 import json
 import logging
+import os
+
 import openai
 import pandas as pd
 import requests
-from tqdm import tqdm
 from pydantic import BaseModel
+from tqdm import tqdm
 
 # Set up logging to display messages of level INFO or higher
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Set up your API key (ensure you set the API_KEY environment variable)
@@ -21,6 +21,7 @@ target_model = "pulze"
 # Paths
 PATH_CURRENT = os.path.abspath(os.getcwd())
 PATH_RESULTS = os.path.join(PATH_CURRENT, "results", "mmlu")
+
 
 # Function to make API call and get answer
 def get_answer(question, model="pulze", temperature=0.01, max_tokens=2048, use_pulze_agent=False):
@@ -34,23 +35,22 @@ def get_answer(question, model="pulze", temperature=0.01, max_tokens=2048, use_p
 
     data = {
         "model": model,
-        "messages": [
-            {"role": "user", "content": f"Question: {question}"}
-        ],
+        "messages": [{"role": "user", "content": f"Question: {question}"}],
         "temperature": temperature,
-        "max_tokens": max_tokens
+        "max_tokens": max_tokens,
     }
     response = requests.post(url, headers=headers, json=data)
     response.raise_for_status()
 
     # Parse the main response JSON
     response_data = response.json()
-    content = response_data['choices'][0]['message']['content']
+    content = response_data["choices"][0]["message"]["content"]
 
     # Just return the raw model data
-    model_data = response_data['metadata']['model']
+    model_data = response_data["metadata"]["model"]
 
     return content, model_data
+
 
 # Rating dimensions
 RATING_DIMENSIONS_DICT = {
@@ -60,8 +60,9 @@ RATING_DIMENSIONS_DICT = {
     "Completeness": "Does the response address all aspects of the input or question, without leaving out important details?",
     "Conciseness": "Is the response concise and to the point, without unnecessary verbosity or repetition?",
     "Appropriateness": "Is the response suitable and appropriate for the given context, without being offensive, biased, or harmful?",
-    "Helpfulness": "Does the response provide useful information or guidance to the user?"
+    "Helpfulness": "Does the response provide useful information or guidance to the user?",
 }
+
 
 # Rating model using Pydantic
 class Rating(BaseModel):
@@ -73,13 +74,15 @@ class Rating(BaseModel):
     appropriateness: int = None
     helpfulness: int = None
 
+
 # Function to get ratings
 def get_ratings(question, gold_answer, model_answer):
     # Replace with your OpenAI API key
     openai.api_key = api_key
     openai.base_url = "https://api.pulze.ai/v1/"
 
-    prompt_template = """You are a highly qualified evaluator who assesses model responses. From now on, you will rate the model's answers based on the following dimensions with a <GRADE> from 0 (worst) to 10 (best).
+    prompt_template = (
+        """You are a highly qualified evaluator who assesses model responses. From now on, you will rate the model's answers based on the following dimensions with a <GRADE> from 0 (worst) to 10 (best).
 
 You will be given:
 
@@ -89,7 +92,9 @@ You will be given:
 
 Your task is to compare the model's answer to the gold standard answer and assign grades based on the following criteria:
 
-""" + "\n".join([f" - {k}: {v}" for k, v in RATING_DIMENSIONS_DICT.items()]) + """
+"""
+        + "\n".join([f" - {k}: {v}" for k, v in RATING_DIMENSIONS_DICT.items()])
+        + """
 
 Important:
 
@@ -100,7 +105,9 @@ Important:
 
 Output nothing but your grades per category! Strictly match the following output format for your answer:
 
-""" + "\n".join([f"{k}: <GRADE>" for k in RATING_DIMENSIONS_DICT.keys()])
+"""
+        + "\n".join([f"{k}: <GRADE>" for k in RATING_DIMENSIONS_DICT.keys()])
+    )
 
     # Prepare the messages
     prompt = f"""<PROMPT>:
@@ -115,11 +122,7 @@ Output nothing but your grades per category! Strictly match the following output
 Expected answer format:
 """ + "\n".join([f"{k}: <GRADE 0-10>" for k in RATING_DIMENSIONS_DICT.keys()])
 
-
-    messages = [
-        {"role": "system", "content": prompt_template},
-        {"role": "user", "content": prompt}
-    ]
+    messages = [{"role": "system", "content": prompt_template}, {"role": "user", "content": prompt}]
 
     try:
         response = openai.chat.completions.create(
@@ -136,9 +139,9 @@ Expected answer format:
             # If no function_call, parse content
             content = response_message.content
             ratings_dict = {}
-            for line in content.strip().split('\n'):
-                if ':' in line:
-                    key, value = line.split(':', 1)
+            for line in content.strip().split("\n"):
+                if ":" in line:
+                    key, value = line.split(":", 1)
                     key = key.strip().lower()
                     value = value.strip()
                     if key in [k.lower() for k in RATING_DIMENSIONS_DICT.keys()]:
@@ -154,16 +157,16 @@ Expected answer format:
         logger.exception("Exception details:")
         return {k.lower(): None for k in RATING_DIMENSIONS_DICT.keys()}
 
+
 # Function to run evaluation
 def run_evaluation(df_questions, subject, config, num_questions=None):
-    config_name = config['name']
-    use_pulze_agent = config['use_pulze_agent']
+    config_name = config["name"]
+    use_pulze_agent = config["use_pulze_agent"]
 
     # Define subject results path per configuration
     os.makedirs(PATH_RESULTS, exist_ok=True)
     subject_results_path = os.path.join(
-        PATH_RESULTS,
-        f"{subject}_{config_name}_{target_model.replace('/', '_')}_pulze.jsonl"
+        PATH_RESULTS, f"{subject}_{config_name}_{target_model.replace('/', '_')}_pulze.jsonl"
     )
 
     # Initialize processed IDs set
@@ -173,13 +176,11 @@ def run_evaluation(df_questions, subject, config, num_questions=None):
     if os.path.exists(subject_results_path):
         try:
             existing_df = pd.read_json(subject_results_path, lines=True)
-            processed_mmlu_ids = set(existing_df['mmlu_id'].unique())
+            processed_mmlu_ids = set(existing_df["mmlu_id"].unique())
             logger.info(f"Resuming from existing results. {len(processed_mmlu_ids)} questions already processed.")
         except Exception as e:
             logger.error(f"Error loading existing results: {e}")
             processed_mmlu_ids = set()
-
-    results = []
 
     if num_questions is not None:
         df_questions_to_evaluate = df_questions.head(num_questions)
@@ -197,21 +198,19 @@ def run_evaluation(df_questions, subject, config, num_questions=None):
             skipped_questions += 1
             continue
 
-        question = row['question']
-        gold_answer = row['answer']
+        question = row["question"]
+        gold_answer = row["answer"]
 
         # Get model's answer
         try:
-            model_answer, model_data = get_answer(
-                question, target_model, use_pulze_agent=use_pulze_agent
-            )
+            model_answer, model_data = get_answer(question, target_model, use_pulze_agent=use_pulze_agent)
 
             # If model_data is a string, parse it
             if isinstance(model_data, str):
                 model_data = json.loads(model_data)
 
             # Extract namespace
-            namespace = model_data.get('namespace', 'Unknown')
+            namespace = model_data.get("namespace", "Unknown")
         except Exception as e:
             logger.error(f"Error getting answer for question ID {mmlu_id}, config {config_name}: {e}")
             model_answer = ""
@@ -228,58 +227,58 @@ def run_evaluation(df_questions, subject, config, num_questions=None):
             "run_config": config_name,
             "use_pulze_agent": use_pulze_agent,
             "model_answer": model_answer,
-            **ratings
+            **ratings,
         }
 
-        result['answering_model'] = namespace
-        result['label'] = "Incorrect Answer"
-        if ratings.get('correctness', 0) > 6:
-            result['label'] = "Correct Answer"
+        result["answering_model"] = namespace
+        result["label"] = "Incorrect Answer"
+        if ratings.get("correctness", 0) > 6:
+            result["label"] = "Correct Answer"
 
         # Append result to file immediately
-        with open(subject_results_path, 'a', encoding='utf-8') as f:
-            f.write(json.dumps(result, ensure_ascii=False) + '\n')
+        with open(subject_results_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(result, ensure_ascii=False) + "\n")
 
         # Update processed IDs
         processed_mmlu_ids.add(mmlu_id)
 
-    logger.info(f"Finished processing subject: {subject}, config: {config_name}. Skipped {skipped_questions} already processed questions.")
+    logger.info(
+        f"Finished processing subject: {subject}, config: {config_name}. Skipped {skipped_questions} already processed questions."
+    )
+
 
 # Main execution block
 if __name__ == "__main__":
     print("Running evaluation...")
     # Define your task list with subjects and number of questions to evaluate
     task_list = [
-        {'subject': 'business_ethics', 'num_questions': None},       # Evaluate all questions
-        {'subject': 'high_school_microeconomics', 'num_questions': None},
-        {'subject': 'high_school_macroeconomics', 'num_questions': None},
-        {'subject': 'international_law', 'num_questions': None},
-        {'subject': 'management', 'num_questions': None},
-        {'subject': 'marketing', 'num_questions': None},
-        {'subject': 'professional_accounting', 'num_questions': None},
-        {'subject': 'professional_law', 'num_questions': 200},       # Evaluate only the first 200 questions
+        {"subject": "business_ethics", "num_questions": None},  # Evaluate all questions
+        {"subject": "high_school_microeconomics", "num_questions": None},
+        {"subject": "high_school_macroeconomics", "num_questions": None},
+        {"subject": "international_law", "num_questions": None},
+        {"subject": "management", "num_questions": None},
+        {"subject": "marketing", "num_questions": None},
+        {"subject": "professional_accounting", "num_questions": None},
+        {"subject": "professional_law", "num_questions": 200},  # Evaluate only the first 200 questions
         # Add more subjects as needed
     ]
 
     # Configurations
     configurations = [
-        {'name': 'no_agent', 'use_pulze_agent': False},
-        {'name': 'with_agent', 'use_pulze_agent': True},
+        {"name": "no_agent", "use_pulze_agent": False},
+        {"name": "with_agent", "use_pulze_agent": True},
     ]
 
     # Create empty dictionaries to collect overall results per configuration
-    all_results = {
-        'no_agent': [],
-        'with_agent': []
-    }
+    all_results = {"no_agent": [], "with_agent": []}
 
     # For per-subject metrics
     per_subject_metrics = []
 
     # Loop over tasks
     for task in task_list:
-        subject = task['subject']
-        num_questions = task.get('num_questions', None)
+        subject = task["subject"]
+        num_questions = task.get("num_questions", None)
 
         # Construct dataset path
         dataset_filename = f"mmlu_{subject}.jsonl"
@@ -292,8 +291,8 @@ if __name__ == "__main__":
 
         # Loop over configurations
         for config in configurations:
-            config_name = config['name']
-            use_pulze_agent = config['use_pulze_agent']
+            config_name = config["name"]
+            use_pulze_agent = config["use_pulze_agent"]
 
             print(f"Configuration: {config_name}")
 
@@ -302,8 +301,7 @@ if __name__ == "__main__":
 
             # Load the results for analysis
             subject_results_path = os.path.join(
-                PATH_RESULTS,
-                f"{subject}_{config_name}_{target_model.replace('/', '_')}_pulze.jsonl"
+                PATH_RESULTS, f"{subject}_{config_name}_{target_model.replace('/', '_')}_pulze.jsonl"
             )
 
             df_config = pd.read_json(subject_results_path, lines=True)
@@ -316,16 +314,18 @@ if __name__ == "__main__":
 
             # Compute per-subject metrics per configuration
             total_questions = len(df_config)
-            num_correct = len(df_config[df_config['label'] == 'Correct Answer'])
+            num_correct = len(df_config[df_config["label"] == "Correct Answer"])
             percentage_correct = (num_correct / total_questions) * 100 if total_questions > 0 else 0
 
-            per_subject_metrics.append({
-                'subject': subject,
-                'run_config': config_name,
-                'total_questions': total_questions,
-                'num_correct': num_correct,
-                'percentage_correct': percentage_correct
-            })
+            per_subject_metrics.append(
+                {
+                    "subject": subject,
+                    "run_config": config_name,
+                    "total_questions": total_questions,
+                    "num_correct": num_correct,
+                    "percentage_correct": percentage_correct,
+                }
+            )
 
             # Print per-subject metrics
             print(f"\nSubject: {subject} | Configuration: {config_name}")
@@ -343,16 +343,15 @@ if __name__ == "__main__":
 
         # Save overall results per configuration
         overall_results_path = os.path.join(
-            PATH_RESULTS,
-            f"overall_{config_name}_{target_model.replace('/', '_')}_pulze.jsonl"
+            PATH_RESULTS, f"overall_{config_name}_{target_model.replace('/', '_')}_pulze.jsonl"
         )
 
         # Save combined results
-        combined_df.to_json(overall_results_path, orient='records', lines=True)
+        combined_df.to_json(overall_results_path, orient="records", lines=True)
 
         # Compute overall metrics per configuration
         total_questions = len(combined_df)
-        num_correct = len(combined_df[combined_df['label'] == 'Correct Answer'])
+        num_correct = len(combined_df[combined_df["label"] == "Correct Answer"])
         percentage_correct = (num_correct / total_questions) * 100 if total_questions > 0 else 0
 
         print(f"\nOverall Evaluation Results Summary for Configuration: {config_name}")

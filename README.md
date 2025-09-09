@@ -47,7 +47,7 @@ By providing a centralized platform for evaluations, we aim to simplify the proc
 #### Results
 
 | Evaluation Mode | FinanceBench Score | Pulze AI Score |
-|-----------------|--------------------|----------------|
+| --------------- | ------------------ | -------------- |
 | Shared Store    | 22%                | **74%**        |
 
 We achieved a **236% improvement** over existing benchmarks in the Shared Store configuration, highlighting our model's exceptional performance in financial data processing.
@@ -78,42 +78,42 @@ Overall Evaluation Results:
 
 **Configuration: no_agent**
 
-| Metric                         | Value    |
-|--------------------------------|----------|
-| Percentage of Correct Answers  | 89.60%   |
-| Total Questions                | 1,663    |
-| Number of Correct Answers      | 1,490    |
-| Number of Incorrect Answers    | 173      |
+| Metric                        | Value  |
+| ----------------------------- | ------ |
+| Percentage of Correct Answers | 89.60% |
+| Total Questions               | 1,663  |
+| Number of Correct Answers     | 1,490  |
+| Number of Incorrect Answers   | 173    |
 
 **Configuration: with_agent**
 
-| Metric                         | Value    |
-|--------------------------------|----------|
-| Percentage of Correct Answers  | 86.59%   |
-| Total Questions                | 1,663    |
-| Number of Correct Answers      | 1,440    |
-| Number of Incorrect Answers    | 223      |
+| Metric                        | Value  |
+| ----------------------------- | ------ |
+| Percentage of Correct Answers | 86.59% |
+| Total Questions               | 1,663  |
+| Number of Correct Answers     | 1,440  |
+| Number of Incorrect Answers   | 223    |
 
 Per-Subject Results:
 
-| Subject                          | Configuration | Correct Answers | Total Questions | Percentage Correct |
-|----------------------------------|---------------|-----------------|-----------------|--------------------|
-| **Business Ethics**              | no_agent      | 80              | 100             | 80.00%             |
-| Business Ethics                  | with_agent    | 72              | 100             | 72.00%             |
-| **High School Microeconomics**   | no_agent      | 226             | 238             | 94.96%             |
-| High School Microeconomics       | with_agent    | 226             | 238             | 94.96%             |
-| **High School Macroeconomics**   | no_agent      | 357             | 386             | 92.49%             |
-| High School Macroeconomics       | with_agent    | 336             | 386             | 87.05%             |
-| **International Law**            | no_agent      | 110             | 121             | 90.91%             |
-| International Law                | with_agent    | 105             | 121             | 86.78%             |
-| **Management**                   | no_agent      | 90              | 103             | 87.38%             |
-| Management                       | with_agent    | 90              | 103             | 87.38%             |
-| **Marketing**                    | no_agent      | 221             | 234             | 94.44%             |
-| Marketing                        | with_agent    | 217             | 234             | 92.74%             |
-| **Professional Accounting**      | no_agent      | 252             | 281             | 89.68%             |
-| Professional Accounting          | with_agent    | 251             | 281             | 89.32%             |
-| **Professional Law**             | no_agent      | 154             | 200             | 77.00%             |
-| Professional Law                 | with_agent    | 143             | 200             | 71.50%             |
+| Subject                        | Configuration | Correct Answers | Total Questions | Percentage Correct |
+| ------------------------------ | ------------- | --------------- | --------------- | ------------------ |
+| **Business Ethics**            | no_agent      | 80              | 100             | 80.00%             |
+| Business Ethics                | with_agent    | 72              | 100             | 72.00%             |
+| **High School Microeconomics** | no_agent      | 226             | 238             | 94.96%             |
+| High School Microeconomics     | with_agent    | 226             | 238             | 94.96%             |
+| **High School Macroeconomics** | no_agent      | 357             | 386             | 92.49%             |
+| High School Macroeconomics     | with_agent    | 336             | 386             | 87.05%             |
+| **International Law**          | no_agent      | 110             | 121             | 90.91%             |
+| International Law              | with_agent    | 105             | 121             | 86.78%             |
+| **Management**                 | no_agent      | 90              | 103             | 87.38%             |
+| Management                     | with_agent    | 90              | 103             | 87.38%             |
+| **Marketing**                  | no_agent      | 221             | 234             | 94.44%             |
+| Marketing                      | with_agent    | 217             | 234             | 92.74%             |
+| **Professional Accounting**    | no_agent      | 252             | 281             | 89.68%             |
+| Professional Accounting        | with_agent    | 251             | 281             | 89.32%             |
+| **Professional Law**           | no_agent      | 154             | 200             | 77.00%             |
+| Professional Law               | with_agent    | 143             | 200             | 71.50%             |
 
 These results demonstrate our model's proficiency across key business domains, reinforcing Pulze AI's capability to handle complex, multidisciplinary tasks.
 
@@ -168,3 +168,4 @@ json_response = response.json()
 
 # Print the response
 print(json.dumps(json_response, indent=4))
+```
