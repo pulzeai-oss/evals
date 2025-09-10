@@ -1,0 +1,24 @@
+{
+  "id": "marketing",
+  "name": "Marketing",
+  "description": "marketing benchmark v0.1",
+  "version": "1.0.0",
+  "created_at": "2025-09-10T21:36:49.785877",
+  "total_items": 5,
+  "templates": [
+    {
+      "name": "pulze_multi_dimensional_evaluation",
+      "description": "Comprehensive evaluation template based on Pulze's benchmark with multiple rating dimensions",
+      "rater_model": "openai/gpt-5"
+    }
+  ],
+  "models_tested": [
+    "anthropic/claude-sonnet-4-0"
+  ],
+  "subject_datasets": {
+    "writing_marketing_materials": 1,
+    "Ulta Beauty": 1,
+    "marketing": 3
+  },
+  "source_evaluation_runs": 1
+}
