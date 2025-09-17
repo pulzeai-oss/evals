@@ -25,10 +25,21 @@ from utils import ConfigLoader, LeaderboardGenerator, ResultsManager
 class EvalCLI:
     """Main CLI class for unified evaluation system."""
 
-    def __init__(self):
+    def __init__(self, validate_config=True):
         """Initialize the CLI with configuration and managers."""
         self.config_loader = ConfigLoader()
         self.config = self.config_loader.get_config()
+
+        # Validate configuration if requested (default True for production, False for testing)
+        if validate_config:
+            errors = self.config_loader.validate_config()
+            if errors:
+                print("Configuration errors found:")
+                for key, error in errors.items():
+                    print(f"  {key}: {error}")
+                print("\nPlease check your environment variables.")
+                sys.exit(1)
+
         self.results_manager = ResultsManager(self.config.get("RESULTS_DIR", "results"))
         self.leaderboard_generator = LeaderboardGenerator(self.results_manager)
 
@@ -224,36 +235,47 @@ def _discover_benchmarks_from_folders_static():
     """Static version of benchmark discovery for parser creation."""
     benchmarks = {}
 
-    # Look for benchmark folders in current directory
-    current_dir = os.getcwd()
-    for item in os.listdir(current_dir):
-        item_path = os.path.join(current_dir, item)
+    try:
+        # Look for benchmark folders in current directory
+        current_dir = os.getcwd()
+        if not os.path.exists(current_dir):
+            return []
 
-        # Skip if not a directory or if it's a system/hidden directory
-        if not os.path.isdir(item_path) or item.startswith(".") or item in ["utils", "evaluators", "tests", "results"]:
-            continue
+        for item in os.listdir(current_dir):
+            item_path = os.path.join(current_dir, item)
 
-        # Check if it has benchmark.json
-        benchmark_json_path = os.path.join(item_path, "benchmark.json")
-        if os.path.exists(benchmark_json_path):
-            try:
-                with open(benchmark_json_path, "r") as f:
-                    benchmark_data = json.load(f)
+            # Skip if not a directory or if it's a system/hidden directory
+            if (
+                not os.path.isdir(item_path)
+                or item.startswith(".")
+                or item in ["utils", "evaluators", "tests", "results"]
+            ):
+                continue
 
-                benchmark_id = benchmark_data.get("id", item)
-                benchmarks[benchmark_id] = True
-            except (json.JSONDecodeError, IOError):
-                # If benchmark.json is invalid, fall back to folder name
-                benchmarks[item] = True
-        else:
-            # Check if it looks like a benchmark folder (has data/ or results/ subdirectory)
-            has_data = os.path.exists(os.path.join(item_path, "data"))
-            has_results = os.path.exists(os.path.join(item_path, "results"))
+            # Check if it has benchmark.json
+            benchmark_json_path = os.path.join(item_path, "benchmark.json")
+            if os.path.exists(benchmark_json_path):
+                try:
+                    with open(benchmark_json_path, "r") as f:
+                        benchmark_data = json.load(f)
 
-            if has_data or has_results:
-                benchmarks[item] = True
+                    benchmark_id = benchmark_data.get("id", item)
+                    benchmarks[benchmark_id] = True
+                except (json.JSONDecodeError, IOError):
+                    # If benchmark.json is invalid, fall back to folder name
+                    benchmarks[item] = True
+            else:
+                # Check if it looks like a benchmark folder (has data/ or results/ subdirectory)
+                has_data = os.path.exists(os.path.join(item_path, "data"))
+                has_results = os.path.exists(os.path.join(item_path, "results"))
 
-    return list(benchmarks.keys())
+                if has_data or has_results:
+                    benchmarks[item] = True
+
+        return list(benchmarks.keys())
+    except (OSError, PermissionError):
+        # If we can't read the directory, return empty list
+        return []
 
 
 def create_parser():
