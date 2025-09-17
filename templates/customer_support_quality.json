@@ -1,0 +1,32 @@
+{
+  "id": "customer_support_quality",
+  "name": "Customer Support Quality",
+  "description": "Template for evaluating customer service responses and support interactions",
+  "rater_model": "smart",
+  "evaluation_prompt": "You are evaluating customer support response quality. Please assess how well the response addresses the customer's needs.\n\nEvaluation Dimensions (0.0 to 1.0 scale):\n\n**Helpfulness**: Does the response actually help solve the customer's problem?\n**Empathy**: Does the response show understanding and care for the customer's situation?\n**Clarity**: Is the response clear and easy for the customer to understand and follow?\n**Completeness**: Are all aspects of the customer's question or concern addressed?\n**Professionalism**: Is the tone appropriate and professional throughout?\n**Actionability**: Does the response provide clear next steps or solutions?\n\nConsider:\n- Whether the response directly addresses the customer's concern\n- If the tone is appropriate for the situation\n- Whether follow-up questions are answered\n- If the response provides practical solutions\n\nReturn evaluation as JSON:\n{\n  \"helpfulness\": <float 0-1>,\n  \"empathy\": <float 0-1>,\n  \"clarity\": <float 0-1>,\n  \"completeness\": <float 0-1>,\n  \"professionalism\": <float 0-1>,\n  \"actionability\": <float 0-1>,\n  \"overall_score\": <average of all scores>,\n  \"reasoning\": \"<explanation of assessment>\",\n  \"passed\": <boolean>\n}",
+  "metrics_config": {
+    "threshold": 0.8,
+    "metrics": [
+      "helpfulness",
+      "empathy",
+      "clarity",
+      "completeness",
+      "professionalism",
+      "actionability"
+    ]
+  },
+  "config": {
+    "model_to_evaluate": {
+      "headers": {
+        "pulze-feature-flags": "{\"auto_tools\":false,\"smart_learn\":false}"
+      },
+      "payload": {}
+    },
+    "rater_model": {
+      "headers": {
+        "pulze-feature-flags": "{\"auto_tools\":false,\"smart_learn\":false}"
+      },
+      "payload": {}
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "academic_assessment",
+  "name": "Academic Assessment Template",
+  "description": "Template for evaluating academic and educational content with focus on accuracy and pedagogical value",
+  "rater_model": "smart",
+  "evaluation_prompt": "You are an expert academic evaluator. Please evaluate the model response for educational content based on the following criteria.\n\nRate each dimension on a scale of 0.0 to 1.0:\n\n**Accuracy**: Is the information factually correct and up-to-date?\n**Clarity**: Is the explanation clear and easy to understand for the target audience?\n**Completeness**: Does the response cover all important aspects of the topic?\n**Educational Value**: How well does this response help someone learn the subject matter?\n\nFor each evaluation, consider:\n- The target audience level (beginner, intermediate, advanced)\n- Whether examples and explanations are appropriate\n- If the response builds understanding progressively\n- Whether any misconceptions are addressed\n\nPlease provide your evaluation as a JSON object:\n{\n  \"accuracy\": <float 0-1>,\n  \"clarity\": <float 0-1>,\n  \"completeness\": <float 0-1>,\n  \"educational_value\": <float 0-1>,\n  \"overall_score\": <average of all scores>,\n  \"reasoning\": \"<detailed explanation>\",\n  \"passed\": <boolean>\n}",
+  "metrics_config": {
+    "threshold": 0.7,
+    "metrics": [
+      "accuracy",
+      "clarity",
+      "completeness",
+      "educational_value"
+    ]
+  },
+  "config": {
+    "model_to_evaluate": {
+      "headers": {
+        "pulze-feature-flags": "{\"auto_tools\":false,\"smart_learn\":false}"
+      },
+      "payload": {}
+    },
+    "rater_model": {
+      "headers": {
+        "pulze-feature-flags": "{\"auto_tools\":false,\"smart_learn\":false}"
+      },
+      "payload": {}
+    }
+  }
+}
