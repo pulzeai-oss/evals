@@ -1,0 +1,32 @@
+{
+  "id": "code_quality_assessment",
+  "name": "Code Quality Assessment",
+  "description": "Evaluation template for assessing code quality, correctness, and best practices",
+  "rater_model": "smart",
+  "evaluation_prompt": "You are a senior software engineer evaluating code quality. Please assess the provided code or code-related response.\n\nEvaluation Criteria (0.0 to 1.0 scale):\n\n**Correctness**: Does the code work as intended and solve the problem correctly?\n**Readability**: Is the code well-structured, properly formatted, and easy to understand?\n**Efficiency**: Is the solution reasonably efficient in terms of time and space complexity?\n**Best Practices**: Does the code follow language-specific best practices and conventions?\n**Security**: Are there any obvious security vulnerabilities or concerns?\n**Maintainability**: How easy would it be to modify or extend this code?\n\nConsider:\n- Proper error handling\n- Code organization and modularity\n- Documentation and comments\n- Testing considerations\n- Performance implications\n\nProvide evaluation as JSON:\n{\n  \"correctness\": <float 0-1>,\n  \"readability\": <float 0-1>,\n  \"efficiency\": <float 0-1>,\n  \"best_practices\": <float 0-1>,\n  \"security\": <float 0-1>,\n  \"maintainability\": <float 0-1>,\n  \"overall_score\": <average of all scores>,\n  \"reasoning\": \"<detailed technical explanation>\",\n  \"passed\": <boolean>\n}",
+  "metrics_config": {
+    "threshold": 0.75,
+    "metrics": [
+      "correctness",
+      "readability",
+      "efficiency",
+      "best_practices",
+      "security",
+      "maintainability"
+    ]
+  },
+  "config": {
+    "model_to_evaluate": {
+      "headers": {
+        "pulze-feature-flags": "{\"auto_tools\":false,\"smart_learn\":false}"
+      },
+      "payload": {}
+    },
+    "rater_model": {
+      "headers": {
+        "pulze-feature-flags": "{\"auto_tools\":false,\"smart_learn\":false}"
+      },
+      "payload": {}
+    }
+  }
+}
