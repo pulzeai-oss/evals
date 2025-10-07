@@ -1,0 +1,34 @@
+{
+  "name": "pulze_multi_dimensional_evaluation_pulze_v01",
+  "description": "Comprehensive evaluation template based on Pulze's benchmark with multiple rating dimensions",
+  "rater_model": "pulze-v0.1",
+  "evaluation_prompt": "You are a highly qualified evaluator who assesses model responses. From now on, you will rate the model's answers based on the following dimensions with a GRADE from 0 (worst) to 10 (best).\n\nYou will be given:\n- A prompt indicated by '<PROMPT>:'\n- The gold standard answer indicated by '<EXPECTED_ANSWER>:'\n- The model's answer indicated by '<RESPONSE>:'\n\nYour task is to compare the model's answer to the gold standard answer and assign grades based on the following criteria:\n\n- Relevance: Is the response relevant to the input or question provided by the user?\n- Correctness: Is the information provided in the response factually accurate?\n- Clarity: Is the response clearly and effectively communicated, with proper grammar and sentence structure?\n- Completeness: Does the response address all aspects of the input or question, without leaving out important details?\n- Conciseness: Is the response concise and to the point, without unnecessary verbosity or repetition?\n- Appropriateness: Is the response suitable and appropriate for the given context, without being offensive, biased, or harmful?\n- Helpfulness: Does the response provide useful information or guidance to the user?\n\nImportant:\n- For numerical answers, consider the model's answer correct if it is within an acceptable range (e.g., a difference of less than 1% from the gold answer).\n- Accept answers that are accurate and comprehensive, even if they use different wording or include additional relevant details not present in the gold answer.\n- Focus on whether the model's answer correctly addresses the question and includes the key points from the gold answer.\n- Do not penalize the model's answer for including extra relevant information unless it introduces inaccuracies.\n\nOutput your grades as a JSON object with the following structure:\n{\n  \"relevance\": <GRADE 0-10>,\n  \"correctness\": <GRADE 0-10>,\n  \"clarity\": <GRADE 0-10>,\n  \"completeness\": <GRADE 0-10>,\n  \"conciseness\": <GRADE 0-10>,\n  \"appropriateness\": <GRADE 0-10>,\n  \"helpfulness\": <GRADE 0-10>,\n  \"overall_score\": <average of all grades normalized to 0-1>,\n  \"reasoning\": \"<explanation of the scores>\",\n  \"passed\": <boolean indicating if this meets the threshold>\n}",
+  "metrics_config": {
+    "metrics": [
+      "relevance",
+      "correctness",
+      "clarity",
+      "completeness",
+      "conciseness",
+      "appropriateness",
+      "helpfulness"
+    ],
+    "threshold": 0.6
+  },
+  "config": {
+    "rater_model": {
+      "headers": {
+        "pulze-feature-flags": "{\"auto_tools\":false,\"smart_learn\":false}"
+      },
+      "payload": {}
+    },
+    "model_to_evaluate": {
+      "headers": {
+        "pulze-feature-flags": "{\"auto_tools\":false,\"smart_learn\":false}"
+      },
+      "payload": {}
+    }
+  },
+  "created_at": "2025-10-07T20:01:29.096054+00:00",
+  "space_id": null
+}
